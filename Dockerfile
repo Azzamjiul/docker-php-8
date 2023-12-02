@@ -1,9 +1,5 @@
 FROM php:8.2.4-fpm
 
-# Arguments defined in docker-compose.yml
-ARG user
-ARG uid
-
 # Install system dependencies
 RUN apt-get update && apt-get install -y \
     git \
@@ -16,26 +12,24 @@ RUN apt-get update && apt-get install -y \
     libzip-dev \
     zip \
     unzip \
-    libgif-dev
+    libgif-dev \
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# Download the latest stable release
-
-# Clear cache
-RUN apt-get clean && rm -rf /var/lib/apt/lists/*
-
-# Install PHP extensions with GD support
+# Install PHP extensions with GD and Intl support
 RUN docker-php-ext-configure gd --with-freetype --with-jpeg \
-    && docker-php-ext-install pdo pdo_mysql exif pcntl bcmath gd zip
+    && docker-php-ext-install pdo pdo_mysql exif pcntl bcmath gd zip intl
 
-# Get latest Composer
+# Get the latest Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
-# Create system user to run Composer and Artisan Commands
+# Create a system user to run Composer and Artisan Commands
+ARG user
+ARG uid
 RUN useradd -G www-data,root -u $uid -d /home/$user $user
 RUN mkdir -p /home/$user/.composer && \
     chown -R $user:$user /home/$user
 
-# Set working directory
+# Set the working directory
 WORKDIR /var/www/html
 
 USER $user
