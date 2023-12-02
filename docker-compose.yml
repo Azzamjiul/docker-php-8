@@ -5,7 +5,7 @@ networks:
 
 services:
     nginx:
-        platform: linux/x86_64
+        # platform: linux/x86_64
         image: nginx:stable-alpine
         container_name: nginx-8
         ports:
@@ -19,7 +19,7 @@ services:
             - laravel
 
     php:
-        platform: linux/x86_64
+        # platform: linux/x86_64
         build:
             context: .
             dockerfile: Dockerfile
